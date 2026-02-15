@@ -5,10 +5,10 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUP
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Server-side client (uses service role key)
+// Server-side client (uses service role key, falls back to public keys)
 export function createServerClient() {
   return createClient(
-    process.env.SUPABASE_URL || '',
-    process.env.SUPABASE_KEY || ''
+    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
   );
 }
