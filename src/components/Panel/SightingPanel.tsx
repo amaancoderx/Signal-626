@@ -50,7 +50,7 @@ function SightingContent({ sighting }: { sighting: Sighting }) {
 
   const fields: { label: string; value: string; isLink?: boolean }[] = [];
 
-  if (sighting.occurred) fields.push({ label: 'Date & Time', value: formatDate(sighting.occurred) });
+  if (sighting.occurred) fields.push({ label: 'Occurred', value: formatDate(sighting.occurred) });
   if (loc.city) fields.push({ label: 'City', value: loc.city });
   if (loc.state) fields.push({ label: 'State', value: loc.state });
   if (loc.country) fields.push({ label: 'Country', value: loc.country });
