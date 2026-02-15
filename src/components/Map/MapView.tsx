@@ -368,9 +368,10 @@ export default function MapView({
         />
         {/* Boundary lines overlay - state/country borders */}
         <TileLayer
-          url="https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           maxZoom={19}
-          opacity={0.15}
+          subdomains="abcd"
+          opacity={0.12}
         />
         {/* Labels layer - country/city names on top */}
         <TileLayer
