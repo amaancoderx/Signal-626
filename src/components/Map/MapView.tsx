@@ -167,7 +167,7 @@ function ClusterLayer({
         circle.bindTooltip(
           `<div style="font-family:Rajdhani,monospace;font-size:12px;color:#FFFFFF">
             <strong>${props.shape || 'Unknown'}</strong><br/>
-            <span style="color:#E6F1FF">${cleanLocation(props.location)}</span><br/>
+            <span style="color:#E6F1FF">${cleanLocation(props.location ?? null)}</span><br/>
             <span style="color:#7A8A99;font-size:10px">Click to view details</span>
           </div>`,
           {
