@@ -160,7 +160,7 @@ export default function StatsHUD({
           {/* Logo */}
           <div className="hud-section flex-row !flex-row items-center gap-2 sm:gap-3 pl-3 sm:pl-4 md:pl-6">
             <div className="relative w-[32px] h-[32px] sm:w-[40px] sm:h-[40px] md:w-[52px] md:h-[52px] flex-shrink-0 logo-breathe">
-              <Image src="/logo.png" alt="Signal 626" fill className="object-contain" priority />
+              <Image src="/logo.png" alt="Signal 626" fill className="object-contain" priority unoptimized />
             </div>
             <div className="flex flex-col">
               <span className="font-display text-[10px] sm:text-xs md:text-sm lg:text-base font-bold tracking-[0.12em] sm:tracking-[0.15em] text-signal-bright"
