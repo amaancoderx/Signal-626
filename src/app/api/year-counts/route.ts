@@ -11,7 +11,12 @@ export async function GET() {
   const { data: rpcData, error: rpcError } = await supabase.rpc('get_year_counts');
 
   if (!rpcError && rpcData) {
-    return NextResponse.json({ yearCounts: rpcData }, {
+    // PostgREST returns BIGINT as strings — coerce to numbers
+    const yearCounts = (rpcData as { year: number | string; count: number | string }[]).map(r => ({
+      year: Number(r.year),
+      count: Number(r.count),
+    }));
+    return NextResponse.json({ yearCounts }, {
       headers: {
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       },

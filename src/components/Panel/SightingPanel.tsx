@@ -12,8 +12,8 @@ interface SightingPanelProps {
 
 function FieldRow({ label, value, isLink }: { label: string; value: string; isLink?: boolean }) {
   return (
-    <div className="flex flex-col gap-0.5 py-2 border-b border-white/5">
-      <span className="text-[10px] font-display tracking-widest text-signal-muted uppercase">
+    <div className="flex flex-col gap-0.5 py-2.5 border-b border-signal-cyan/8">
+      <span className="text-[10px] font-display tracking-widest text-signal-cyan/50 uppercase">
         {label}
       </span>
       {isLink ? (
@@ -21,7 +21,8 @@ function FieldRow({ label, value, isLink }: { label: string; value: string; isLi
           href={value}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-white hover:text-signal-cyan transition-colors text-sm break-all"
+          className="text-signal-cyan hover:text-signal-bright transition-colors text-sm break-all"
+          style={{ textShadow: '0 0 6px rgba(0,212,255,0.2)' }}
         >
           {value}
         </a>
@@ -37,7 +38,6 @@ function buildHeading(loc: { city: string | null; state: string | null; country:
   if (loc.city) parts.push(loc.city);
   if (loc.state && loc.state !== loc.city) parts.push(loc.state);
   if (loc.country) {
-    // Only add country if it's not already mentioned in city or state
     const countryLower = loc.country.toLowerCase();
     const alreadyMentioned = parts.some(p => p.toLowerCase().includes(countryLower));
     if (!alreadyMentioned) parts.push(loc.country);
@@ -71,28 +71,28 @@ function SightingContent({ sighting }: { sighting: Sighting }) {
 
   return (
     <>
-      {/* Header */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-          <span className="text-[10px] font-display tracking-[0.3em] text-white">
+      {/* Header with neon glow */}
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-signal-cyan animate-pulse" style={{ boxShadow: '0 0 10px rgba(0,212,255,0.6)' }} />
+          <span className="text-[10px] font-display tracking-[0.3em] text-signal-cyan glow-text-cyan">
             SIGHTING #{sighting.id}
           </span>
         </div>
         {sighting.location && (
-          <h2 className="font-display text-lg text-signal-bright tracking-wider">
+          <h2 className="font-display text-xl text-signal-bright tracking-wider glow-text-white">
             {buildHeading(loc)}
           </h2>
         )}
         {sighting.occurred && (
-          <p className="text-xs text-signal-muted mt-0.5 font-display tracking-wider uppercase">
+          <p className="text-xs text-signal-cyan/60 mt-1 font-display tracking-wider uppercase">
             {formatDate(sighting.occurred)}
           </p>
         )}
       </div>
 
-      {/* Divider */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-3" />
+      {/* Neon divider */}
+      <div className="neon-line w-full mb-4" />
 
       {/* Fields */}
       <div className="space-y-0">
@@ -103,11 +103,18 @@ function SightingContent({ sighting }: { sighting: Sighting }) {
 
       {/* Summary */}
       {sighting.summary && (
-        <div className="mt-4">
-          <span className="text-[10px] font-display tracking-widest text-signal-muted uppercase block mb-2">
+        <div className="mt-5">
+          <span className="text-[10px] font-display tracking-widest text-signal-cyan/50 uppercase block mb-2">
             Summary
           </span>
-          <div className="glass-panel-green rounded-lg p-3 max-h-48 overflow-y-auto">
+          <div
+            className="rounded-xl p-4 max-h-48 overflow-y-auto"
+            style={{
+              background: 'rgba(0,212,255,0.04)',
+              border: '1px solid rgba(0,212,255,0.12)',
+              boxShadow: 'inset 0 0 20px rgba(0,212,255,0.03)',
+            }}
+          >
             <p className="text-sm text-signal-bright/80 leading-relaxed whitespace-pre-wrap">
               {sighting.summary}
             </p>
@@ -129,29 +136,35 @@ export default function SightingPanel({ sightingId, onClose }: SightingPanelProp
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '100%', opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-          className="fixed top-0 right-0 h-full w-full sm:w-[380px] md:w-[400px] z-[2000]
-                     glass-panel overflow-y-auto overscroll-contain"
+          className="fixed top-0 right-0 h-full w-full sm:w-[380px] md:w-[420px] z-[2000]
+                     overflow-y-auto overscroll-contain"
           style={{
-            borderLeft: '1px solid rgba(255,255,255,0.1)',
-            boxShadow: '-10px 0 40px rgba(0,0,0,0.5)',
+            background: 'linear-gradient(180deg, rgba(8,14,28,0.96) 0%, rgba(5,10,20,0.98) 100%)',
+            backdropFilter: 'blur(32px)',
+            borderLeft: '1px solid rgba(0,229,255,0.12)',
+            boxShadow: '-10px 0 60px rgba(0,0,0,0.6), -5px 0 30px rgba(0,229,255,0.04)',
           }}
         >
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 sm:w-8 sm:h-8 rounded-lg glow-border flex items-center justify-center
-                       hover:bg-signal-red/20 hover:border-signal-red/30 transition-all z-10 group active:scale-95"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center
+                       transition-all z-10 group active:scale-95"
+            style={{
+              border: '1px solid rgba(0,229,255,0.15)',
+              background: 'rgba(8,14,28,0.6)',
+            }}
           >
             <svg width="12" height="12" viewBox="0 0 12 12" className="text-signal-muted group-hover:text-signal-red transition-colors">
               <path d="M1 1L11 11M1 11L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
 
-          <div className="p-4 pt-14 sm:p-6 sm:pt-14 pb-safe">
+          <div className="p-5 pt-14 sm:p-6 sm:pt-14 pb-safe">
             {isLoading && (
               <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mb-4" />
-                <span className="text-xs font-display tracking-widest text-white loading-pulse">
+                <div className="w-12 h-12 border-2 border-signal-cyan/20 border-t-signal-cyan rounded-full animate-spin mb-4" />
+                <span className="text-xs font-display tracking-widest text-signal-cyan loading-pulse glow-text-cyan">
                   RETRIEVING DATA...
                 </span>
               </div>
@@ -159,7 +172,7 @@ export default function SightingPanel({ sightingId, onClose }: SightingPanelProp
 
             {error && (
               <div className="text-center py-20">
-                <div className="font-display text-signal-red text-sm tracking-wider mb-2">
+                <div className="font-display text-signal-red text-sm tracking-wider mb-2 glow-text-red">
                   SIGNAL LOST
                 </div>
                 <p className="text-signal-muted text-xs">Failed to retrieve sighting data</p>

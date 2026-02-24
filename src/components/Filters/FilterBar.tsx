@@ -22,6 +22,19 @@ const HEATMAP_MODES: { key: HeatmapMode; label: string; desc: string }[] = [
   { key: 'precision', label: 'PRECISION', desc: 'Exact location detail' },
 ];
 
+const btnBase = `w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center
+  transition-all duration-200 group active:scale-95 relative`;
+
+const btnStyle = {
+  background: 'rgba(5, 12, 28, 0.92)',
+  border: '1px solid rgba(0, 229, 255, 0.2)',
+  boxShadow: '0 0 20px rgba(0,0,0,0.5), 0 0 8px rgba(0,229,255,0.06), inset 0 1px 0 rgba(0,229,255,0.08)',
+  backdropFilter: 'blur(16px)',
+};
+
+const iconClass = `text-signal-cyan/70 group-hover:text-signal-cyan transition-all duration-200
+  group-hover:drop-shadow-[0_0_6px_rgba(0,229,255,0.6)]`;
+
 export default function FilterBar({
   shapes,
   selectedShape,
@@ -41,16 +54,22 @@ export default function FilterBar({
       initial={{ x: -60, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, delay: 0.4 }}
-      className="absolute left-2 sm:left-3 top-[52px] sm:top-[68px] md:top-[80px] z-[1000] flex flex-col gap-1.5 sm:gap-2"
+      className="absolute left-2 sm:left-3 top-[56px] sm:top-[72px] md:top-[84px] z-[1000] flex flex-col gap-2 sm:gap-2.5"
     >
       {/* Toggle filters */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-panel flex items-center justify-center
-                   hover:bg-white/10 transition-all group hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] active:scale-95"
+        className={btnBase}
+        style={{
+          ...btnStyle,
+          borderColor: isOpen ? 'rgba(0,229,255,0.4)' : btnStyle.border?.toString().match(/rgba[^)]+\)/)?.[0],
+          boxShadow: isOpen
+            ? '0 0 20px rgba(0,0,0,0.5), 0 0 14px rgba(0,229,255,0.15), inset 0 1px 0 rgba(0,229,255,0.1)'
+            : (btnStyle.boxShadow as string),
+        }}
         title="Filters"
       >
-        <svg width="14" height="14" viewBox="0 0 16 16" className="text-white group-hover:text-signal-bright transition-colors group-hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.5)]">
+        <svg width="18" height="18" viewBox="0 0 16 16" className={iconClass}>
           <path d="M1 3h14M4 8h8M6 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       </button>
@@ -60,22 +79,33 @@ export default function FilterBar({
         <button
           onClick={onHeatmapToggle}
           onContextMenu={(e) => { e.preventDefault(); if (heatmapEnabled) setHeatmapMenuOpen(!heatmapMenuOpen); }}
-          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-panel flex items-center justify-center transition-all group active:scale-95
-            ${heatmapEnabled ? 'border-[#00FF9C]/40 bg-[#00FF9C]/10 shadow-[0_0_12px_rgba(0,255,156,0.15)]' : 'hover:shadow-[0_0_12px_rgba(0,255,156,0.12)]'}`}
+          className={btnBase}
+          style={{
+            ...btnStyle,
+            borderColor: heatmapEnabled ? 'rgba(0,229,255,0.45)' : undefined,
+            background: heatmapEnabled ? 'rgba(0,229,255,0.1)' : btnStyle.background,
+            boxShadow: heatmapEnabled
+              ? '0 0 20px rgba(0,0,0,0.5), 0 0 18px rgba(0,229,255,0.2), inset 0 0 10px rgba(0,229,255,0.04)'
+              : (btnStyle.boxShadow as string),
+          }}
           title={heatmapEnabled ? 'Heatmap ON (right-click for modes)' : 'Toggle Heatmap'}
         >
-          <svg width="14" height="14" viewBox="0 0 16 16" className={`transition-colors ${heatmapEnabled ? 'text-[#00FF9C] drop-shadow-[0_0_4px_rgba(0,255,156,0.5)]' : 'text-signal-muted group-hover:text-[#00FF9C] group-hover:drop-shadow-[0_0_4px_rgba(0,255,156,0.4)]'}`}>
+          <svg width="18" height="18" viewBox="0 0 16 16" className={`transition-all duration-200 ${heatmapEnabled ? 'text-signal-cyan drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]' : iconClass}`}>
             <circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
-            <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="0.5" opacity="0.5" />
+            <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="0.7" opacity="0.5" />
           </svg>
+          {heatmapEnabled && (
+            <div className="absolute inset-0 rounded-xl border border-signal-cyan/20 animate-ping" style={{ animationDuration: '3s' }} />
+          )}
         </button>
 
-        {/* Heatmap mode indicator dot */}
+        {/* Heatmap indicator dot */}
         {heatmapEnabled && (
           <button
             onClick={() => setHeatmapMenuOpen(!heatmapMenuOpen)}
-            className="absolute -right-0.5 -bottom-0.5 w-3 h-3 rounded-full bg-[#00FF9C] border border-signal-darker
-                       shadow-[0_0_6px_rgba(0,255,156,0.6)] cursor-pointer hover:scale-125 transition-transform"
+            className="absolute -right-0.5 -bottom-0.5 w-3.5 h-3.5 rounded-full bg-signal-cyan border-2 border-signal-darker
+                       cursor-pointer hover:scale-125 transition-transform"
+            style={{ boxShadow: '0 0 10px rgba(0,229,255,0.7)' }}
             title="Change heatmap mode"
           />
         )}
@@ -88,9 +118,9 @@ export default function FilterBar({
               animate={{ x: 0, opacity: 1, scale: 1 }}
               exit={{ x: -20, opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.2 }}
-              className="absolute left-10 sm:left-11 top-0 w-44 sm:w-52 glass-panel rounded-lg p-2"
+              className="absolute left-12 sm:left-[52px] top-0 w-44 sm:w-52 glass-panel-cyan rounded-lg p-2"
             >
-              <div className="text-[9px] font-display tracking-[0.3em] text-[#00FF9C]/70 px-2 py-1 mb-1">
+              <div className="text-[9px] font-display tracking-[0.3em] text-signal-cyan/60 px-2 py-1 mb-1">
                 HEATMAP MODE
               </div>
               {HEATMAP_MODES.map((m) => (
@@ -99,9 +129,13 @@ export default function FilterBar({
                   onClick={() => { onHeatmapModeChange(m.key); setHeatmapMenuOpen(false); }}
                   className={`w-full text-left px-2 py-1.5 rounded text-xs transition-all ${
                     heatmapMode === m.key
-                      ? 'bg-[#00FF9C]/10 text-[#00FF9C]'
-                      : 'text-signal-muted hover:text-white hover:bg-white/5'
+                      ? 'text-signal-cyan'
+                      : 'text-signal-muted hover:text-signal-bright hover:bg-signal-cyan/5'
                   }`}
+                  style={heatmapMode === m.key ? {
+                    background: 'rgba(0,212,255,0.1)',
+                    border: '1px solid rgba(0,212,255,0.2)',
+                  } : { border: '1px solid transparent' }}
                 >
                   <div className="font-display tracking-wider font-bold">{m.label}</div>
                   <div className="text-[10px] opacity-60">{m.desc}</div>
@@ -115,11 +149,11 @@ export default function FilterBar({
       {/* Export */}
       <button
         onClick={onExportYear}
-        className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-panel flex items-center justify-center
-                   hover:bg-white/10 transition-all group hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] active:scale-95"
+        className={btnBase}
+        style={btnStyle}
         title="Export Year Data"
       >
-        <svg width="14" height="14" viewBox="0 0 16 16" className="text-signal-muted group-hover:text-white transition-colors group-hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.5)]">
+        <svg width="18" height="18" viewBox="0 0 16 16" className={iconClass}>
           <path d="M8 2v8M4 7l4 4 4-4M2 13h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
@@ -127,11 +161,11 @@ export default function FilterBar({
       {/* Fullscreen */}
       <button
         onClick={onFullscreen}
-        className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-panel flex items-center justify-center
-                   hover:bg-white/10 transition-all group hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] active:scale-95"
+        className={btnBase}
+        style={btnStyle}
         title="Fullscreen"
       >
-        <svg width="14" height="14" viewBox="0 0 16 16" className="text-signal-muted group-hover:text-white transition-colors group-hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.5)]">
+        <svg width="18" height="18" viewBox="0 0 16 16" className={iconClass}>
           <path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
@@ -144,15 +178,19 @@ export default function FilterBar({
             animate={{ x: 0, opacity: 1, scale: 1 }}
             exit={{ x: -20, opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-10 sm:left-11 top-0 w-40 sm:w-48 glass-panel rounded-lg p-2 max-h-60 sm:max-h-72 overflow-y-auto"
+            className="absolute left-12 sm:left-[52px] top-0 w-40 sm:w-48 glass-panel-cyan rounded-lg p-2 max-h-60 sm:max-h-72 overflow-y-auto"
           >
-            <div className="text-[9px] font-display tracking-[0.3em] text-signal-muted px-2 py-1 mb-1">
+            <div className="text-[9px] font-display tracking-[0.3em] text-signal-cyan/60 px-2 py-1 mb-1">
               SHAPE FILTER
             </div>
             <button
               onClick={() => { onShapeChange('All'); setIsOpen(false); }}
               className={`w-full text-left px-2 py-1.5 rounded text-xs transition-all
-                ${selectedShape === 'All' ? 'bg-white/10 text-white' : 'text-signal-muted hover:text-white hover:bg-white/5'}`}
+                ${selectedShape === 'All' ? 'text-signal-cyan' : 'text-signal-muted hover:text-signal-bright hover:bg-signal-cyan/5'}`}
+              style={selectedShape === 'All' ? {
+                background: 'rgba(0,212,255,0.1)',
+                border: '1px solid rgba(0,212,255,0.2)',
+              } : { border: '1px solid transparent' }}
             >
               All Shapes
             </button>
@@ -161,7 +199,11 @@ export default function FilterBar({
                 key={shape}
                 onClick={() => { onShapeChange(shape); setIsOpen(false); }}
                 className={`w-full text-left px-2 py-1.5 rounded text-xs transition-all
-                  ${selectedShape === shape ? 'bg-white/10 text-white' : 'text-signal-muted hover:text-white hover:bg-white/5'}`}
+                  ${selectedShape === shape ? 'text-signal-cyan' : 'text-signal-muted hover:text-signal-bright hover:bg-signal-cyan/5'}`}
+                style={selectedShape === shape ? {
+                  background: 'rgba(0,212,255,0.1)',
+                  border: '1px solid rgba(0,212,255,0.2)',
+                } : { border: '1px solid transparent' }}
               >
                 {shape}
               </button>

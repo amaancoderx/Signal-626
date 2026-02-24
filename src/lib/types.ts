@@ -54,6 +54,8 @@ export type PlaybackSpeed = 1 | 2 | 5;
 
 export type PlaybackDirection = 'forward' | 'reverse';
 
+export type TimelineMode = 'year' | 'signal';
+
 export interface TimelineState {
   year: number;
   isPlaying: boolean;

@@ -11,12 +11,12 @@
 [![Next.js](https://img.shields.io/badge/Next.js_14-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
-[![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
+[![MapLibre](https://img.shields.io/badge/MapLibre_GL-396CB2?style=for-the-badge&logo=maplibre&logoColor=white)](https://maplibre.org/)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 ---
 
-`150,554 REPORTS` | `626 YEARS` | `15+ SHAPES` | `REAL-TIME CLUSTERING` | `3 HEATMAP MODES`
+`150,554 REPORTS` | `626 YEARS` | `191 COUNTRIES` | `15+ SHAPES` | `REAL-TIME CLUSTERING` | `3 HEATMAP MODES`
 
 </div>
 
@@ -24,7 +24,7 @@
 
 ## Overview
 
-**Signal 626** is a high-performance, full-stack geospatial intelligence platform that visualizes over **150,000 UFO sighting reports** from the [National UFO Reporting Center (NUFORC)](https://nuforc.org/) database. Built with a sci-fi tactical interface aesthetic, it lets users explore sightings across **626 years of history** with temporal playback, advanced filtering, and multiple visualization modes.
+**Signal 626** is a high-performance, full-stack geospatial intelligence platform that visualizes over **150,000 UFO sighting reports** from the [National UFO Reporting Center (NUFORC)](https://nuforc.org/) database. Built with a sci-fi tactical interface aesthetic, it lets users explore sightings across **626 years of history** with temporal playback, country-level intelligence reports, anomaly detection, and multiple visualization modes.
 
 The name **"626"** represents the span of years covered: from the earliest recorded sighting in **1400 AD** to the present day **2026**.
 
@@ -33,28 +33,48 @@ The name **"626"** represents the span of years covered: from the earliest recor
 ## Features
 
 ### Interactive Global Map
-- **Real-time clustering** powered by Supercluster — handles 150k+ points at 60fps
+- **MapLibre GL JS** vector map with CARTO dark-matter tiles for smooth 60fps rendering
+- **Real-time clustering** with holographic-style cluster rings and energy node markers
+- **Natural Earth country boundaries** — accurate GeoJSON polygons with hover highlighting
 - **Color-coded markers** by UFO shape type (15+ categories)
 - **Zoom-adaptive rendering** — clusters break apart as you zoom in to reveal individual sightings
+- **Tactical grid overlay** with coordinate labels
+- **Radar sweep animation** for immersive atmosphere
 - **Click any marker** to view full sighting details in the intelligence panel
-- Dark-themed CartoDB tiles with custom styling
+
+### Country Intelligence Panel
+- **Click any country** on the map to open a detailed intelligence report
+- **Country hover preview** — floating popup shows report count, risk index, and anomaly level
+- **Location-aware filtering** — uses both bounding box and NUFORC location strings to accurately attribute sightings to countries, preventing false positives from neighboring regions
+- **Monthly distribution** — radial chart showing sighting patterns by month with peak month detection
+- **Top shapes** breakdown — what types of UFOs are reported in each country
+- **Hotspot ranking** — most active cities/regions within the country
+- **Anomaly level gauge** — statistical z-score analysis comparing country vs global baseline
+- **Global activity trend** — historical sighting activity chart (1960–present)
+- **191 countries** supported with geographic bounds and center coordinates
 
 ### Heatmap Visualization
 - **Three distinct modes** for different analysis perspectives:
   - **Density** — Standard concentration mapping
   - **Clusters** — Macro hotspot patterns with wider radius
   - **Precision** — Exact location detail at high resolution
-- Sci-fi green/cyan color gradient
-- Smooth 300ms fade transitions
+- Sci-fi cyan/purple color gradient
+- Smooth transitions between modes
 - Toggle and switch modes from the filter bar
 
 ### Temporal Playback Engine
-- **Animated timeline** from 1400 to 2026
-- Play/pause with adjustable speed (1x, 2x, 5x)
+- **Year Mode** — Animated timeline from 1400 to 2026 with play/pause and adjustable speed (1x, 2x, 5x)
+- **Signal Replay Mode** — Chronological day-by-day playback showing sightings appearing in real-time order within a year
 - Step forward/backward through individual years
-- **Non-linear slider** — equal space for each era (1400s, 1800s, 1900s, etc.)
+- **Year histogram** — bar chart showing report density across the full timeline
 - Quick-select buttons for key historical years
-- Auto-loop at the end of the timeline
+- Auto-advance between years in signal mode
+
+### Global Anomaly Index
+- Real-time anomaly score (0–100) displayed in the HUD
+- Combines **year-over-year growth spikes**, **absolute count magnitude**, and **geographic clustering density**
+- Four alert levels: LOW / ELEVATED / HIGH / CRITICAL
+- Animated signal waveform and particle effects
 
 ### Intelligence Panel
 - Slides in on marker selection with spring physics animation
@@ -65,15 +85,22 @@ The name **"626"** represents the span of years covered: from the earliest recor
 - Filter sightings by any of the 15+ reported UFO shapes
 - Shapes include: Light, Circle, Triangle, Fireball, Sphere, Disk, Oval, Cylinder, Formation, Diamond, Changing, Chevron, Flash, Cigar, Rectangle, and more
 
+### Country Selector
+- Dropdown in the top HUD bar to quickly select any of the 191 tracked countries
+- Auto-zooms the map to the selected country's bounds
+- Or click directly on the map to select a country
+
 ### Data Export
 - Export current year's sighting data as JSON with one click
 
 ### Visual Design
+- **Animated star field** background with twinkling stars
 - **Glassmorphism** panels with frosted-glass blur effects
-- **Scanline animation** — subtle CRT-style horizontal sweep
-- **Grid overlay** — tactical interface background pattern
+- **Holographic popups** with scanlines, corner brackets, and energy animations
+- **Radar sweep** overlay with concentric rings
+- **Tactical grid** — lat/lng coordinate overlay
 - **Vignette effect** — darkened edges for depth
-- **Glow effects** — text and border luminance in white, cyan, amber, and red
+- **Glow effects** — text and border luminance in cyan, green, amber, and red
 - **Custom typography** — Orbitron (headers), JetBrains Mono (data), Rajdhani (body)
 
 ### Fully Responsive
@@ -92,9 +119,8 @@ The name **"626"** represents the span of years covered: from the earliest recor
 | **Language** | TypeScript 5.7 |
 | **Styling** | TailwindCSS 3.4 + Custom CSS |
 | **Animation** | Framer Motion 11.15 |
-| **Maps** | Leaflet 1.9.4 + React Leaflet 4.2 |
-| **Clustering** | Supercluster 8.0 |
-| **Heatmap** | Leaflet.Heat 0.2 |
+| **Maps** | MapLibre GL JS (CARTO dark-matter vector tiles) |
+| **Boundaries** | Natural Earth 110m GeoJSON polygons |
 | **Data Fetching** | TanStack React Query 5.62 |
 | **Database** | Supabase (PostgreSQL) |
 | **Geocoding** | Python 3 + geopy (Nominatim) |
@@ -108,9 +134,9 @@ The name **"626"** represents the span of years covered: from the earliest recor
 src/
 ├── app/
 │   ├── layout.tsx              # Root layout, meta tags, overlays
-│   ├── page.tsx                # Main interactive page
+│   ├── page.tsx                # Main interactive page (state management)
 │   ├── providers.tsx           # React Query provider
-│   ├── globals.css             # Animations, effects, Leaflet overrides
+│   ├── globals.css             # Animations, effects, popup styles
 │   └── api/
 │       ├── sightings/route.ts  # GET /api/sightings?year=&shape=
 │       ├── sighting/[id]/      # GET /api/sighting/:id
@@ -118,28 +144,38 @@ src/
 │       └── stats/              # GET /api/stats
 ├── components/
 │   ├── Map/
-│   │   ├── MapView.tsx         # Leaflet map + clusters + heatmap
-│   │   └── DynamicMap.tsx      # SSR-disabled lazy loader
+│   │   ├── MapView.tsx         # MapLibre GL map + clusters + heatmap + borders
+│   │   ├── DynamicMap.tsx      # SSR-disabled lazy loader
+│   │   └── CountryHoverPopup.tsx  # Floating country preview on hover
 │   ├── Timeline/
-│   │   └── TimelineControl.tsx # Playback controls + slider
+│   │   ├── TimelineControl.tsx # Playback controls + slider + histogram
+│   │   └── SignalModeToggle.tsx # Year/Signal mode switcher
 │   ├── Filters/
 │   │   └── FilterBar.tsx       # Shape filter + heatmap + export
 │   ├── Panel/
-│   │   └── SightingPanel.tsx   # Sighting detail view
-│   └── HUD/
-│       └── StatsHUD.tsx        # Header stats bar
+│   │   ├── SightingPanel.tsx   # Sighting detail view
+│   │   └── IntelligencePanel.tsx # Country intelligence report
+│   ├── HUD/
+│   │   ├── StatsHUD.tsx        # Header stats bar + country selector
+│   │   └── AnomalyIndex.tsx    # Global anomaly score indicator
+│   └── StarField.tsx           # Animated star background
 ├── hooks/
 │   ├── useSightings.ts         # Fetch sightings by year + shape
 │   ├── useYearCounts.ts        # Fetch year histogram
 │   ├── useTimeline.ts          # Playback state machine
-│   └── useStats.ts             # Global statistics
+│   ├── useStats.ts             # Global statistics
+│   └── useSignalReplay.ts      # Signal replay day-by-day playback
 ├── lib/
 │   ├── types.ts                # TypeScript interfaces
 │   ├── constants.ts            # Colors, config, speeds
 │   ├── utils.ts                # Date/location formatting
-│   └── supabase.ts             # Supabase client
-└── types/
-    └── leaflet.heat.d.ts       # Heatmap type declarations
+│   ├── supabase.ts             # Supabase client
+│   ├── countries.ts            # 191 country bounds + metadata
+│   ├── countryNames.ts         # ISO numeric codes → country names
+│   ├── intelligence.ts         # Country intelligence report builder
+│   └── anomalyIndex.ts         # Anomaly score calculation
+└── public/
+    └── ne_countries.geojson    # Natural Earth country polygons
 ```
 
 ---
@@ -155,8 +191,8 @@ src/
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/yourusername/signal-626.git
-cd signal-626
+git clone https://github.com/amaancoderx/Signal-626.git
+cd Signal-626
 npm install
 ```
 
@@ -254,12 +290,14 @@ All API routes use **RPC functions first** for speed (~100ms), with automatic **
 | Metric | Detail |
 |--------|--------|
 | **Data Points** | 150,554 sightings rendered via clustering |
-| **Clustering** | Supercluster reduces to ~500-1000 visible markers |
-| **Map FPS** | 60fps during pan/zoom with clustering |
+| **Map Engine** | MapLibre GL JS with WebGL-accelerated rendering |
+| **Clustering** | Built-in GeoJSON source clustering (~500-1000 visible markers) |
+| **Map FPS** | 60fps during pan/zoom |
 | **Initial Load** | Map component lazy-loaded (code splitting) |
 | **API Response** | ~100ms with RPC, <500ms with REST fallback |
 | **Caching** | Multi-layer: React Query + HTTP cache headers |
 | **Geocode Coverage** | 149,964 / 150,554 records (99.6%) |
+| **Country Filtering** | Bounding box + location-aware verification for accuracy |
 
 ---
 
@@ -275,7 +313,9 @@ All sighting data is sourced from the **[National UFO Reporting Center (NUFORC)]
 |--------|---------|-------|
 | `fast_geocode.py` | US state centroids + major cities lookup | ~5 minutes |
 | `geocode_locations.py` | Precise geocoding via Nominatim API | ~4-5 hours |
-| `geocode_remaining.py` | Handle edge cases from main geocoding | Variable |
+| `fix_geocoding.py` | Fix misplaced coordinates | Variable |
+| `fix_all_countries.py` | Verify & fix international coordinates | Variable |
+| `verify_all_coords.py` | Validate coordinate accuracy | Variable |
 
 ---
 
