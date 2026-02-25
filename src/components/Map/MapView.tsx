@@ -74,19 +74,24 @@ function customizeStyle(map: maplibregl.Map) {
       }
 
       // ── Boundaries: detect by ID or source-layer ──
+      // Country borders hidden (Natural Earth replaces them).
+      // State/province borders fade in only at zoom 6+ to avoid
+      // double-line with Natural Earth at country-level zoom.
       const isBoundaryById = (id.includes('boundary') || id.includes('border') || id.includes('admin'));
       const isBoundaryBySource = ('source-layer' in layer && (layer as Record<string, unknown>)['source-layer'] === 'boundary');
       if ((isBoundaryById || isBoundaryBySource) && type === 'line') {
         if (id.includes('country')) {
-          // Hide CARTO country borders (Natural Earth replaces them)
           map.setPaintProperty(id, 'line-opacity', 0);
         } else if (id.includes('state') || id.includes('province')) {
-          // State/province borders — visible
           map.setPaintProperty(id, 'line-color', '#6abce0');
-          map.setPaintProperty(id, 'line-opacity', 0.6);
+          map.setPaintProperty(id, 'line-opacity', [
+            'interpolate', ['linear'], ['zoom'],
+            5, 0,   // hidden at country-level zoom (no double line)
+            6, 0.4,  // fade in when zoomed into a country
+            8, 0.6,
+          ] as unknown as number);
           map.setPaintProperty(id, 'line-width', 0.8);
         } else {
-          // Hide all deeper boundaries (district/city/etc.) — CARTO data is inaccurate
           map.setPaintProperty(id, 'line-opacity', 0);
         }
       }
