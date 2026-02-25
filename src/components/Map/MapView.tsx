@@ -73,16 +73,22 @@ function customizeStyle(map: maplibregl.Map) {
         map.setPaintProperty(id, 'fill-opacity', 0.5);
       }
 
-      // ── Boundaries: hide ALL CARTO boundary lines ──
-      // CARTO tiles use OSM data which draws a different India boundary.
-      // Their state/province borders also trace India's outer edge,
-      // causing a double outline with our Natural Earth overlay.
-      // Only Natural Earth GeoJSON draws country borders.
-      // State/city text labels remain visible (symbol layers unaffected).
+      // ── Boundaries: detect by ID or source-layer ──
       const isBoundaryById = (id.includes('boundary') || id.includes('border') || id.includes('admin'));
       const isBoundaryBySource = ('source-layer' in layer && (layer as Record<string, unknown>)['source-layer'] === 'boundary');
       if ((isBoundaryById || isBoundaryBySource) && type === 'line') {
-        map.setPaintProperty(id, 'line-opacity', 0);
+        if (id.includes('country')) {
+          // Hide CARTO country borders (Natural Earth replaces them)
+          map.setPaintProperty(id, 'line-opacity', 0);
+        } else if (id.includes('state') || id.includes('province')) {
+          // State/province borders — visible
+          map.setPaintProperty(id, 'line-color', '#6abce0');
+          map.setPaintProperty(id, 'line-opacity', 0.6);
+          map.setPaintProperty(id, 'line-width', 0.8);
+        } else {
+          // Hide all deeper boundaries (district/city/etc.) — CARTO data is inaccurate
+          map.setPaintProperty(id, 'line-opacity', 0);
+        }
       }
 
       // ── Roads → subtle blue network (visible on zoom) ──
@@ -178,19 +184,6 @@ function setupNaturalEarthBorders(map: maplibregl.Map) {
           'line-color': '#00E5FF',
           'line-width': ['case', ['boolean', ['feature-state', 'hover'], false], 2, 0],
           'line-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.6, 0],
-        },
-      }, insertBefore);
-
-      // India border mask — wide dark line that covers CARTO's conflicting boundary
-      map.addLayer({
-        id: 'ne-india-border-mask',
-        type: 'line',
-        source: 'ne-countries',
-        filter: ['==', ['get', 'ISO_A2'], 'IN'],
-        paint: {
-          'line-color': '#070e1a',
-          'line-width': ['interpolate', ['linear'], ['zoom'], 1, 4, 4, 6, 8, 8],
-          'line-opacity': 1,
         },
       }, insertBefore);
 
