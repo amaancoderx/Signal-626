@@ -68,7 +68,7 @@ export const COUNTRIES: CountryData[] = [
   { code: 'HU', name: 'Hungary', bounds: [[45.7, 16.1], [48.6, 22.9]], center: [47.2, 19.5], zoom: 7 },
   // ── I ──
   { code: 'IS', name: 'Iceland', bounds: [[63.4, -24.5], [66.5, -13.5]], center: [65.0, -19.0], zoom: 6 },
-  { code: 'IN', name: 'India', bounds: [[6.7, 68.2], [35.5, 97.4]], center: [20.6, 78.9], zoom: 5 },
+  { code: 'IN', name: 'India', bounds: [[6.7, 68.2], [37.1, 97.4]], center: [22.0, 78.9], zoom: 5 },
   { code: 'ID', name: 'Indonesia', bounds: [[-11.0, 95.0], [6.1, 141.0]], center: [-2.5, 118.0], zoom: 4 },
   { code: 'IR', name: 'Iran', bounds: [[25.1, 44.0], [39.8, 63.3]], center: [32.4, 53.7], zoom: 5 },
   { code: 'IQ', name: 'Iraq', bounds: [[29.1, 38.8], [37.4, 48.6]], center: [33.2, 43.7], zoom: 6 },
