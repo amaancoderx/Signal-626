@@ -73,22 +73,15 @@ function customizeStyle(map: maplibregl.Map) {
         map.setPaintProperty(id, 'fill-opacity', 0.5);
       }
 
-      // ── Boundaries: detect by ID or source-layer ──
+      // ── Boundaries: hide ALL CARTO boundary lines ──
+      // Natural Earth GeoJSON provides accurate country borders.
+      // CARTO tile boundaries use OSM data which conflicts with
+      // official Indian map (state borders trace a different country outline).
+      // Labels (text) remain visible — only border lines are hidden.
       const isBoundaryById = (id.includes('boundary') || id.includes('border') || id.includes('admin'));
       const isBoundaryBySource = ('source-layer' in layer && (layer as Record<string, unknown>)['source-layer'] === 'boundary');
       if ((isBoundaryById || isBoundaryBySource) && type === 'line') {
-        if (id.includes('country')) {
-          // Hide CARTO country borders (Natural Earth replaces them)
-          map.setPaintProperty(id, 'line-opacity', 0);
-        } else if (id.includes('state') || id.includes('province')) {
-          // State/province borders — visible
-          map.setPaintProperty(id, 'line-color', '#6abce0');
-          map.setPaintProperty(id, 'line-opacity', 0.6);
-          map.setPaintProperty(id, 'line-width', 0.8);
-        } else {
-          // Hide all deeper boundaries (district/city/etc.) — CARTO data is inaccurate
-          map.setPaintProperty(id, 'line-opacity', 0);
-        }
+        map.setPaintProperty(id, 'line-opacity', 0);
       }
 
       // ── Roads → subtle blue network (visible on zoom) ──
