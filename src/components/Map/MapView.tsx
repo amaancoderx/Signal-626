@@ -277,8 +277,8 @@ function setupSightingsLayers(map: maplibregl.Map) {
     filter: ['!', ['has', 'point_count']],
     paint: {
       'circle-color': ['get', 'color'],
-      'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 3, 6, 5, 12, 8],
-      'circle-opacity': 0.08,
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 5, 3, 7, 6, 10, 10, 14, 14, 18],
+      'circle-opacity': 0.12,
       'circle-blur': 0.5,
     },
   });
@@ -290,10 +290,10 @@ function setupSightingsLayers(map: maplibregl.Map) {
     filter: ['!', ['has', 'point_count']],
     paint: {
       'circle-color': ['get', 'color'],
-      'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 1.5, 3, 2.5, 6, 3.5, 10, 5, 14, 7],
-      'circle-opacity': 0.8,
-      'circle-stroke-color': 'rgba(255,255,255,0.08)',
-      'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 1, 0, 8, 0.5],
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 2.5, 3, 3.5, 6, 5, 10, 7, 14, 10],
+      'circle-opacity': 0.9,
+      'circle-stroke-color': 'rgba(255,255,255,0.12)',
+      'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 1, 0.3, 6, 0.6, 10, 1],
     },
   });
 }

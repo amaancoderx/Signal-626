@@ -288,38 +288,146 @@ function TemporalHeatmap({ matrix }: { matrix: number[][] }) {
 }
 
 /* ═══════════════════════════════════════════
-   CITY BREAKDOWN (ranked list)
+   CITY BREAKDOWN (ranked list with shape info)
    ═══════════════════════════════════════════ */
-function CityBreakdown({ cities }: { cities: { city: string; count: number; pct: number }[] }) {
+function CityBreakdown({ cities }: { cities: { city: string; count: number; pct: number; topShape: string; shapeColor: string }[] }) {
   const maxCount = cities.length > 0 ? cities[0].count : 1;
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1">
       {cities.map((c, i) => (
         <motion.div
           key={c.city}
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, delay: i * 0.035 }}
+          transition={{ duration: 0.3, delay: i * 0.03 }}
+          className="rounded-md p-1.5"
+          style={{ background: i === 0 ? 'rgba(0, 229, 255, 0.03)' : 'transparent' }}
         >
-          <div className="flex items-center gap-2">
-            <span className="text-[9px] text-slate-600 font-mono w-4 text-right">{i + 1}</span>
-            <span className="text-[10px] text-slate-300 flex-1 truncate">{c.city}</span>
-            <span className="text-[9px] text-cyan-400 font-mono">{c.count}</span>
-            <span className="text-[8px] text-slate-600 w-6 text-right">{c.pct}%</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[8px] text-slate-600 font-mono w-3 text-right">{i + 1}</span>
+            <span className="text-[10px] text-slate-200 flex-1 truncate font-medium">{c.city}</span>
+            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: c.shapeColor }} />
+            <span className="text-[8px] text-slate-500 truncate max-w-[50px]">{c.topShape}</span>
+            <span className="text-[9px] text-cyan-400 font-mono ml-1">{c.count}</span>
           </div>
-          <div className="ml-6 h-[2px] rounded-full overflow-hidden mt-0.5" style={{ background: 'rgba(255,255,255,0.03)' }}>
+          <div className="ml-4 h-[3px] rounded-full overflow-hidden mt-1" style={{ background: 'rgba(255,255,255,0.03)' }}>
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${(c.count / maxCount) * 100}%` }}
-              transition={{ duration: 0.5, delay: i * 0.035 }}
+              transition={{ duration: 0.5, delay: i * 0.03 }}
               className="h-full rounded-full"
-              style={{ background: `rgba(0, 229, 255, ${0.25 + (c.count / maxCount) * 0.4})` }}
+              style={{ background: `rgba(0, 229, 255, ${0.2 + (c.count / maxCount) * 0.45})` }}
             />
           </div>
         </motion.div>
       ))}
     </div>
   );
+}
+
+/* ═══════════════════════════════════════════
+   SHAPE DONUT CHART (canvas ring)
+   ═══════════════════════════════════════════ */
+function ShapeDonut({ shapes, size = 100 }: { shapes: { shape: string; count: number; pct: number }[]; size?: number }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !shapes.length) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = size * 2;
+    canvas.height = size * 2;
+    ctx.scale(2, 2);
+    const cx = size / 2, cy = size / 2;
+    const outerR = size / 2 - 4;
+    const innerR = outerR * 0.62;
+    ctx.clearRect(0, 0, size, size);
+
+    const total = shapes.reduce((s, sh) => s + sh.count, 0) || 1;
+    let angle = -Math.PI / 2;
+
+    for (const sh of shapes) {
+      const sliceAngle = (sh.count / total) * Math.PI * 2;
+      const color = getShapeColor(sh.shape);
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, angle, angle + sliceAngle);
+      ctx.arc(cx, cy, innerR, angle + sliceAngle, angle, true);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.7;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Slice border
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, angle, angle + sliceAngle);
+      ctx.strokeStyle = 'rgba(10, 16, 32, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      angle += sliceAngle;
+    }
+
+    // Center fill
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerR - 1, 0, Math.PI * 2);
+    ctx.fillStyle = '#0A1020';
+    ctx.fill();
+
+    // Center text
+    ctx.fillStyle = '#E2E8F0';
+    ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(shapes.length), cx, cy - 4);
+    ctx.fillStyle = 'rgba(100, 116, 139, 0.6)';
+    ctx.font = '6px Inter, system-ui, sans-serif';
+    ctx.fillText('types', cx, cy + 6);
+  }, [shapes, size]);
+
+  return <canvas ref={canvasRef} style={{ width: size, height: size }} />;
+}
+
+/* ═══════════════════════════════════════════
+   MINI SPARKLINE (tiny inline chart)
+   ═══════════════════════════════════════════ */
+function MiniSparkline({ data, color = '#00E5FF' }: { data: number[]; color?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !data.length) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const w = canvas.width = 120;
+    const h = canvas.height = 24;
+    ctx.clearRect(0, 0, w, h);
+    const max = Math.max(...data, 1);
+    const step = w / (data.length - 1 || 1);
+
+    // Area fill
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, color + '20');
+    grad.addColorStop(1, color + '00');
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let i = 0; i < data.length; i++) ctx.lineTo(i * step, h - (data[i] / max) * (h - 2));
+    ctx.lineTo((data.length - 1) * step, h);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    ctx.moveTo(0, h - (data[0] / max) * (h - 2));
+    for (let i = 1; i < data.length; i++) ctx.lineTo(i * step, h - (data[i] / max) * (h - 2));
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }, [data, color]);
+  return <canvas ref={canvasRef} style={{ width: '60px', height: '12px' }} />;
 }
 
 /* ═══════════════════════════════════════════
@@ -480,21 +588,62 @@ export default function RightPanel({
   const topShapes = isCountryView ? (report?.topShapes ?? globalShapes) : globalShapes;
   const maxShapeCount = topShapes.length > 0 ? topShapes[0].count : 1;
 
-  // ── City breakdown ──
+  // ── City breakdown (with per-city top shape) ──
   const cityBreakdown = useMemo(() => {
     const src = isCountryView ? filteredPoints : points;
-    const cityCounts = new Map<string, number>();
+    const cityData = new Map<string, { count: number; shapes: Map<string, number> }>();
     for (const p of src) {
       const { city } = parseLocation(p.location);
       const key = city || 'Unknown';
-      cityCounts.set(key, (cityCounts.get(key) || 0) + 1);
+      if (!cityData.has(key)) cityData.set(key, { count: 0, shapes: new Map() });
+      const entry = cityData.get(key)!;
+      entry.count++;
+      const shape = p.shape || 'Unknown';
+      entry.shapes.set(shape, (entry.shapes.get(shape) || 0) + 1);
     }
     const total = src.length || 1;
-    return Array.from(cityCounts.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 12)
-      .map(([city, count]) => ({ city, count, pct: Math.round((count / total) * 100) }));
+    return Array.from(cityData.entries())
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 15)
+      .map(([city, data]) => {
+        const topShape = Array.from(data.shapes.entries()).sort((a, b) => b[1] - a[1])[0];
+        return {
+          city,
+          count: data.count,
+          pct: Math.round((data.count / total) * 100),
+          topShape: topShape ? topShape[0] : 'Unknown',
+          shapeColor: getShapeColor(topShape ? topShape[0] : null),
+        };
+      });
   }, [points, filteredPoints, isCountryView]);
+
+  // ── Shape diversity + concentration ──
+  const shapeStats = useMemo(() => {
+    const src = isCountryView ? filteredPoints : points;
+    const shapeCounts = new Map<string, number>();
+    for (const p of src) shapeCounts.set(p.shape || 'Unknown', (shapeCounts.get(p.shape || 'Unknown') || 0) + 1);
+    const uniqueShapes = shapeCounts.size;
+    // Shannon diversity index
+    const total = src.length || 1;
+    let entropy = 0;
+    Array.from(shapeCounts.values()).forEach(count => {
+      const p = count / total;
+      if (p > 0) entropy -= p * Math.log2(p);
+    });
+    const maxEntropy = uniqueShapes > 1 ? Math.log2(uniqueShapes) : 1;
+    const diversity = Math.round((entropy / maxEntropy) * 100);
+    return { uniqueShapes, diversity };
+  }, [points, filteredPoints, isCountryView]);
+
+  // ── Recent 5 year mini trend ──
+  const recentTrend = useMemo(() => {
+    const data: number[] = [];
+    for (let y = year - 4; y <= year; y++) {
+      const yc = yearCounts.find(c => Number(c.year) === y);
+      data.push(yc ? Number(yc.count) : 0);
+    }
+    return data;
+  }, [yearCounts, year]);
 
   // ── Temporal heatmap (7 days × 12 months) ──
   const temporalMatrix = useMemo(() => {
@@ -574,9 +723,9 @@ export default function RightPanel({
           </motion.div>
         </AnimatePresence>
 
-        {/* ═══ PRIMARY STATS (3 cols) ═══ */}
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          <motion.div layoutId="stat-sightings" className="rounded-lg p-2.5" style={{ background: 'rgba(0, 229, 255, 0.04)', border: '1px solid rgba(0, 229, 255, 0.08)' }}>
+        {/* ═══ PRIMARY STATS (2 rows of 3) ═══ */}
+        <div className="grid grid-cols-3 gap-1.5 mb-2">
+          <motion.div layoutId="stat-sightings" className="rounded-lg p-2" style={{ background: 'rgba(0, 229, 255, 0.04)', border: '1px solid rgba(0, 229, 255, 0.08)' }}>
             <div className="text-[7px] tracking-[0.1em] text-slate-500 uppercase mb-1">Sightings</div>
             {isLoading ? (
               <div className="w-3 h-3 border-2 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin" />
@@ -584,26 +733,43 @@ export default function RightPanel({
               <Counter value={sightingCount} className="font-display text-base font-bold text-cyan-400" />
             )}
           </motion.div>
-          <motion.div layoutId="stat-anomaly" className="rounded-lg p-2.5" style={{ background: 'rgba(255, 179, 0, 0.03)', border: '1px solid rgba(255, 179, 0, 0.06)' }}>
+          <motion.div layoutId="stat-anomaly" className="rounded-lg p-2" style={{ background: 'rgba(255, 179, 0, 0.03)', border: '1px solid rgba(255, 179, 0, 0.06)' }}>
             <div className="text-[7px] tracking-[0.1em] text-slate-500 uppercase mb-1">Anomaly</div>
             <span className="font-display text-base font-bold" style={{ color: ANOMALY_COLORS[anomaly.status] }}>
               {anomaly.index.toFixed(1)}
             </span>
           </motion.div>
-          <div className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+          <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
             <div className="text-[7px] tracking-[0.1em] text-slate-500 uppercase mb-1">YoY</div>
             <span className={`font-display text-base font-bold ${yoyDelta !== null && yoyDelta >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
               {yoyDelta !== null ? `${yoyDelta > 0 ? '+' : ''}${yoyDelta}%` : '—'}
             </span>
           </div>
         </div>
+        <div className="grid grid-cols-3 gap-1.5 mb-3">
+          <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)' }}>
+            <div className="text-[7px] tracking-[0.1em] text-slate-500 uppercase mb-1">Types</div>
+            <span className="font-display text-base font-bold text-slate-200">{shapeStats.uniqueShapes}</span>
+          </div>
+          <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)' }}>
+            <div className="text-[7px] tracking-[0.1em] text-slate-500 uppercase mb-1">Diversity</div>
+            <span className="font-display text-base font-bold text-purple-400">{shapeStats.diversity}%</span>
+          </div>
+          <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)' }}>
+            <div className="text-[7px] tracking-[0.1em] text-slate-500 uppercase mb-1">Daily Avg</div>
+            <span className="font-display text-base font-bold text-slate-200">{dailyAvg.toFixed(1)}</span>
+          </div>
+        </div>
 
-        {/* ═══ KEY METRICS ═══ */}
+        {/* ═══ 5-YEAR SPARKLINE + KEY METRICS ═══ */}
         <div className="rounded-lg p-2.5 mb-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)' }}>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[8px] tracking-[0.1em] text-slate-500 uppercase">5-Year Trend</span>
+            <MiniSparkline data={recentTrend} />
+          </div>
           <StatRow label="Status" value={anomaly.status} color={ANOMALY_COLORS[anomaly.status]} />
           <StatRow label="Historical Median" value={formatNumber(historicalMedian)} />
           <StatRow label="Peak Month" value={peakMonth ? `${peakMonth.label} (${peakMonth.count})` : '—'} color="#00E5FF" />
-          <StatRow label="Daily Average" value={dailyAvg.toFixed(1)} />
           <StatRow
             label="vs Median"
             value={historicalMedian > 0 ? `${sightingCount >= historicalMedian ? '+' : ''}${Math.round(((sightingCount - historicalMedian) / historicalMedian) * 100)}%` : '—'}
@@ -612,7 +778,7 @@ export default function RightPanel({
           {isCountryView && <StatRow label="Global Share" value={`${countryShare}%`} color="#00E5FF" />}
           {anomaly.hotspot && (
             <StatRow
-              label="Hotspot"
+              label="Hotspot Center"
               value={`${anomaly.hotspot[0].toFixed(1)}°, ${anomaly.hotspot[1].toFixed(1)}°`}
               color="rgba(0, 229, 255, 0.6)"
             />
@@ -664,33 +830,36 @@ export default function RightPanel({
               </motion.div>
             )}
 
-            {/* ── TOP SHAPES ── */}
+            {/* ── SHAPE ANALYSIS: Donut + Bars ── */}
             {topShapes.length > 0 && hasData && (
               <motion.div {...stagger(4)} className="mb-3">
                 <SectionLabel>Shape Analysis</SectionLabel>
-                <div className="space-y-1.5">
-                  {topShapes.map(({ shape, count, pct }) => {
-                    const color = getShapeColor(shape);
-                    return (
-                      <div key={shape}>
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
-                          <span className="text-[10px] text-slate-300 flex-1 truncate">{shape}</span>
-                          <span className="text-[9px] text-cyan-400 font-mono">{count}</span>
-                          <span className="text-[8px] text-slate-600 w-6 text-right">{pct}%</span>
+                <div className="flex gap-3 items-start">
+                  <ShapeDonut shapes={topShapes} size={90} />
+                  <div className="flex-1 min-w-0 space-y-1">
+                    {topShapes.slice(0, 6).map(({ shape, count, pct }) => {
+                      const color = getShapeColor(shape);
+                      return (
+                        <div key={shape}>
+                          <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
+                            <span className="text-[9px] text-slate-300 flex-1 truncate">{shape}</span>
+                            <span className="text-[8px] text-cyan-400 font-mono">{count}</span>
+                            <span className="text-[7px] text-slate-600 w-5 text-right">{pct}%</span>
+                          </div>
+                          <div className="h-[2px] rounded-full overflow-hidden ml-3" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(count / maxShapeCount) * 100}%` }}
+                              transition={{ duration: 0.5 }}
+                              className="h-full rounded-full"
+                              style={{ background: color, opacity: 0.6 }}
+                            />
+                          </div>
                         </div>
-                        <div className="h-[2px] rounded-full overflow-hidden ml-3" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(count / maxShapeCount) * 100}%` }}
-                            transition={{ duration: 0.5 }}
-                            className="h-full rounded-full"
-                            style={{ background: color, opacity: 0.6 }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </motion.div>
             )}
