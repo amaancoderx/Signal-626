@@ -18,6 +18,7 @@ interface RightPanelProps {
   onCountryChange: (country: string) => void;
   yearCounts: YearCount[];
   isLoading: boolean;
+  className?: string;
 }
 
 const ANOMALY_COLORS: Record<string, string> = {
@@ -525,7 +526,7 @@ function CountrySelect({ value, onChange }: { value: string; onChange: (v: strin
    MAIN RIGHT PANEL
    ═══════════════════════════════════════════ */
 export default function RightPanel({
-  points, yearCount, year, selectedCountry, onCountryChange, yearCounts, isLoading,
+  points, yearCount, year, selectedCountry, onCountryChange, yearCounts, isLoading, className,
 }: RightPanelProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const country = getCountryByCode(selectedCountry);
@@ -689,7 +690,7 @@ export default function RightPanel({
   return (
     <div
       ref={scrollRef}
-      className="hidden md:flex flex-col w-[340px] lg:w-[380px] xl:w-[420px] flex-shrink-0 overflow-y-auto"
+      className={className || "hidden md:flex flex-col w-[340px] lg:w-[380px] xl:w-[420px] flex-shrink-0 overflow-y-auto"}
       style={{ background: '#0A1020', borderLeft: '1px solid rgba(0, 229, 255, 0.08)' }}
     >
       <div className="p-4 lg:p-5">

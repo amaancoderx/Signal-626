@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import DynamicMap from '@/components/Map/DynamicMap';
 import TimelineControl from '@/components/Timeline/TimelineControl';
 import SightingPanel from '@/components/Panel/SightingPanel';
@@ -79,11 +80,16 @@ export default function HomePage() {
     else { hoverTimeoutRef.current = setTimeout(() => setCountryHover(null), 80); }
   }, []);
 
+  const [mobileIntelOpen, setMobileIntelOpen] = useState(false);
+
   const handleCountryClickFromMap = useCallback((code: string) => {
     setCountryHover(null);
     setSelectedSighting(null);
     const country = getCountryByCode(code);
-    if (country) setSelectedCountry(code);
+    if (country) {
+      setSelectedCountry(code);
+      setMobileIntelOpen(true);
+    }
   }, []);
 
   const signalReplay = useSignalReplay({
@@ -280,6 +286,55 @@ export default function HomePage() {
 
       {/* Sighting detail panel - overlay */}
       <SightingPanel sightingId={selectedSighting} onClose={() => setSelectedSighting(null)} />
+
+      {/* Mobile Intel Panel - bottom sheet overlay */}
+      <AnimatePresence>
+        {mobileIntelOpen && selectedCountry !== 'World' && (
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className="fixed inset-0 z-[1500] md:hidden flex flex-col"
+          >
+            {/* Backdrop */}
+            <div
+              className="flex-shrink-0 h-16"
+              onClick={() => setMobileIntelOpen(false)}
+              style={{ background: 'rgba(0,0,0,0.5)' }}
+            />
+            {/* Sheet */}
+            <div className="flex-1 min-h-0 relative" style={{ background: '#0A1020', borderTop: '1px solid rgba(0, 229, 255, 0.15)' }}>
+              {/* Drag handle + close */}
+              <div className="sticky top-0 z-10 flex items-center justify-center pt-2 pb-1" style={{ background: '#0A1020' }}>
+                <div className="w-10 h-1 rounded-full bg-slate-600" />
+                <button
+                  onClick={() => setMobileIntelOpen(false)}
+                  className="absolute right-3 top-2 w-8 h-8 rounded-md flex items-center justify-center text-slate-500 hover:text-red-400 transition-colors"
+                  style={{ border: '1px solid rgba(255,255,255,0.06)' }}
+                >
+                  <svg width="10" height="10" viewBox="0 0 10 10">
+                    <path d="M2 2L8 8M2 8L8 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
+              <RightPanel
+                points={points}
+                yearCount={yearCount}
+                year={timeline.year}
+                selectedCountry={selectedCountry}
+                onCountryChange={(code) => {
+                  setSelectedCountry(code);
+                  if (code === 'World') setMobileIntelOpen(false);
+                }}
+                yearCounts={yearCounts}
+                isLoading={sightingsLoading}
+                className="flex flex-col w-full h-full overflow-y-auto"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
