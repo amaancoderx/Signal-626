@@ -283,6 +283,9 @@ function setupSightingsLayers(map: maplibregl.Map) {
     },
   });
 
+  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  const dotScale = isTouchDevice ? 1.6 : 1;
+
   map.addLayer({
     id: 'sighting-dots',
     type: 'circle',
@@ -290,7 +293,7 @@ function setupSightingsLayers(map: maplibregl.Map) {
     filter: ['!', ['has', 'point_count']],
     paint: {
       'circle-color': ['get', 'color'],
-      'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 2.5, 3, 3.5, 6, 5, 10, 7, 14, 10],
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 2.5 * dotScale, 3, 3.5 * dotScale, 6, 5 * dotScale, 10, 7 * dotScale, 14, 10 * dotScale],
       'circle-opacity': 0.9,
       'circle-stroke-color': 'rgba(255,255,255,0.12)',
       'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 1, 0.3, 6, 0.6, 10, 1],
@@ -498,9 +501,15 @@ export default function MapView({
       });
     });
 
-    // Click sighting → detail
+    // Click sighting → detail (expanded touch area on mobile)
     map.on('click', 'sighting-dots', (e) => {
-      const features = map.queryRenderedFeatures(e.point, { layers: ['sighting-dots'] });
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const tolerance = isTouchDevice ? 15 : 3;
+      const bbox: [maplibregl.PointLike, maplibregl.PointLike] = [
+        [e.point.x - tolerance, e.point.y - tolerance],
+        [e.point.x + tolerance, e.point.y + tolerance],
+      ];
+      const features = map.queryRenderedFeatures(bbox, { layers: ['sighting-dots'] });
       if (!features.length) return;
       const id = features[0].properties?.id;
       if (id) onSightingClick(id);
@@ -574,10 +583,16 @@ export default function MapView({
       countryHoverRef.current?.(null);
     });
 
-    // Click country → intelligence panel
+    // Click country → intelligence panel (wider sighting check on mobile to prioritize dots)
     map.on('click', 'ne-country-fill', (e) => {
       if (!e.features?.length) return;
-      const sightingFeatures = map.queryRenderedFeatures(e.point, { layers: ['sighting-dots', 'clusters'] });
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const tolerance = isTouchDevice ? 20 : 3;
+      const bbox: [maplibregl.PointLike, maplibregl.PointLike] = [
+        [e.point.x - tolerance, e.point.y - tolerance],
+        [e.point.x + tolerance, e.point.y + tolerance],
+      ];
+      const sightingFeatures = map.queryRenderedFeatures(bbox, { layers: ['sighting-dots', 'clusters'] });
       if (sightingFeatures.length > 0) return;
       const iso = e.features[0].properties?.ISO_A2 as string | undefined;
       if (iso && iso !== '-99') countryClickRef.current?.(iso);

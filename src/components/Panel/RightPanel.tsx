@@ -701,7 +701,7 @@ export default function RightPanel({
           {isCountryView && (
             <button
               onClick={() => onCountryChange('World')}
-              className="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-red-400 transition-colors"
+              className="w-6 h-6 rounded hidden md:flex items-center justify-center text-slate-500 hover:text-red-400 transition-colors"
               style={{ border: '1px solid rgba(255,255,255,0.06)' }}
             >
               <svg width="8" height="8" viewBox="0 0 10 10">
