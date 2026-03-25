@@ -81,6 +81,7 @@ export default function HomePage() {
 
   const handleCountryClickFromMap = useCallback((code: string) => {
     setCountryHover(null);
+    setSelectedSighting(null);
     const country = getCountryByCode(code);
     if (country) setSelectedCountry(code);
   }, []);
