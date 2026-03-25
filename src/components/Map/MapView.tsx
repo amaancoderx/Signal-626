@@ -445,9 +445,11 @@ export default function MapView({
   const hoveredCountryRef = useRef<string | null>(null);
   const countryHoverRef = useRef(onCountryHover);
   const countryClickRef = useRef(onCountryClick);
+  const pointsRef = useRef(points);
   const [webglFailed, setWebglFailed] = useState(false);
   countryHoverRef.current = onCountryHover;
   countryClickRef.current = onCountryClick;
+  pointsRef.current = points;
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -484,7 +486,8 @@ export default function MapView({
       setupNaturalEarthBorders(map);
       setupSightingsLayers(map);
       setupHeatmapLayer(map);
-      if (points.length > 0) updateSightingsSource(map, points);
+      // Use ref to get latest points (avoids stale closure when data loads before map)
+      if (pointsRef.current.length > 0) updateSightingsSource(map, pointsRef.current);
     });
 
     // Click cluster → zoom
